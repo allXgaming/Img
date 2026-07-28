@@ -2,10 +2,10 @@ require('dotenv').config();
 
 async function callOpenRouter(chatHistory) {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey || apiKey === "YOUR_API_KEY" || apiKey === "YOUR_OPENROUTER_FREE_KEY") {
+  if (!apiKey || apiKey === "your_openrouter_api_key_here" || apiKey === "YOUR_OPENROUTER_FREE_KEY") {
     return "Welcome to Zero Cut Studio! Please configure your OpenRouter API key on the backend.";
   }
-  
+
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
