@@ -10,10 +10,8 @@ const { validateAuthData } = require('./script');
 const app = express();
 app.use(express.json());
 
-// CORS মিডলওয়্যার ইন্টিগ্রেশন
 app.use(corsMiddleware);
 
-// ১. Services রাউট
 app.get('/api/services', async (req, res) => {
   try {
     const snap = await db.collection('services').orderBy('order', 'asc').get();
@@ -24,7 +22,6 @@ app.get('/api/services', async (req, res) => {
   }
 });
 
-// ২. Testimonials রাউট
 app.get('/api/testimonials', async (req, res) => {
   try {
     const snap = await db.collection('testimonials').get();
@@ -35,7 +32,6 @@ app.get('/api/testimonials', async (req, res) => {
   }
 });
 
-// ৩. FAQs রাউট
 app.get('/api/faqs', async (req, res) => {
   try {
     const snap = await db.collection('faqs').orderBy('order').get();
@@ -46,7 +42,6 @@ app.get('/api/faqs', async (req, res) => {
   }
 });
 
-// ৪. Showcases রাউট
 app.get('/api/showcases', async (req, res) => {
   try {
     const snap = await db.collection('showcases').orderBy('order', 'asc').get();
@@ -57,7 +52,6 @@ app.get('/api/showcases', async (req, res) => {
   }
 });
 
-// ৫. Portfolio রাউট
 app.get('/api/portfolios', async (req, res) => {
   try {
     const snap = await db.collection('portfolios').orderBy('timestamp', 'desc').get();
@@ -68,7 +62,6 @@ app.get('/api/portfolios', async (req, res) => {
   }
 });
 
-// ৬. Team রাউট
 app.get('/api/team', async (req, res) => {
   try {
     const snap = await db.collection('team').get();
@@ -79,7 +72,6 @@ app.get('/api/team', async (req, res) => {
   }
 });
 
-// ৭. Content (Main) রাউট
 app.get('/api/content', async (req, res) => {
   try {
     const doc = await db.collection('content').doc('main').get();
@@ -93,21 +85,19 @@ app.get('/api/content', async (req, res) => {
   }
 });
 
-// ৮. Site Stats রাউট
 app.get('/api/stats', async (req, res) => {
   try {
     const doc = await db.collection('siteStats').doc('main').get();
     if (doc.exists) {
       res.status(200).json(doc.data());
     } else {
-      res.status(200).json({ yearsExperience: 5, projectsEdited: 150, happyClients: 85 });
+      res.status(200).json({ yearsExperience: 0, projectsEdited: 0, happyClients: 0 });
     }
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch stats" });
   }
 });
 
-// ৯. AI Chat ইন্টারফেস
 app.post('/api/chat/ai', async (req, res) => {
   const { history } = req.body;
   try {
@@ -118,7 +108,6 @@ app.post('/api/chat/ai', async (req, res) => {
   }
 });
 
-// ১০. Auth / Sign Up API
 app.post('/api/auth/signup', async (req, res) => {
   const { email, password, name } = req.body;
   const validation = validateAuthData(email, password);
@@ -136,7 +125,6 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
-// ১১. Auth / Login API
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   const validation = validateAuthData(email, password);
@@ -152,7 +140,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// ১২. Chat / Support Messages API (GET & POST)
 app.get('/api/chat/messages', async (req, res) => {
   const { uid, role } = req.query;
   if (!uid) return res.status(400).json({ error: "Missing uid query" });
@@ -161,9 +148,9 @@ app.get('/api/chat/messages', async (req, res) => {
     if (role === 'admin') {
       const messagesSnapshot = await db.collectionGroup('messages').get();
       const userIds = new Set();
-      messagesSnapshot.forEach(doc => { 
+      messagesSnapshot.forEach(doc => {
         if (doc.data().senderId && doc.data().senderId !== 'admin') {
-          userIds.add(doc.data().senderId); 
+          userIds.add(doc.data().senderId);
         }
       });
       const groupData = await Promise.all([...userIds].map(async userId => {
@@ -206,5 +193,4 @@ app.post('/api/chat/messages', async (req, res) => {
   }
 });
 
-// Vercel Serverless এক্সপ্রেস হ্যান্ডলার এক্সপোর্ট
 module.exports = app;
